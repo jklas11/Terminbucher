@@ -26,7 +26,7 @@ jobs:
       run: |
         # --onefile packt alles in eine Datei
         # --noconsole verhindert das schwarze Fenster (optional)
-        pyinstaller --onefile --name "TerminBot" --hidden-import="selenium.webdriver.firefox.options" --hidden-import="selenium.webdriver.firefox.service" --hidden-import="webdriver_manager.firefox" --hidden-import="selenium.webdriver.common.by" --hidden-import="selenium.webdriver.support.ui" --hidden-import="selenium.webdriver.support.expected_conditions" --hidden-import="selenium.webdriver.common.action_chains" check_and_book.py
+        pyinstaller --onefile --name "TerminBot" --hidden-import="selenium.webdriver.firefox.options" --hidden-import="selenium.webdriver.firefox.service" --hidden-import="selenium.webdriver.firefox.webdriver" --hidden-import="webdriver_manager.firefox" --hidden-import="selenium.webdriver.common.by" --hidden-import="selenium.webdriver.support.ui" --hidden-import="selenium.webdriver.support.expected_conditions" --hidden-import="selenium.webdriver.common.action_chains" check_and_book.py
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
