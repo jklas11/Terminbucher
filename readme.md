@@ -1,4 +1,4 @@
-# TerminBot Nürnberg Kfz-Zulassung
+# TerminBot Nürnberg
 
 Dieses Skript automatisiert die Suche und Buchung eines zeitnahen Termins (innerhalb der nächsten 5 Tage) bei der Nürnberger Stadtverwaltung.
 
