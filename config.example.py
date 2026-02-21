@@ -1,7 +1,7 @@
 # Konfigurationsdatei für die Terminbuchung
 
 # Generelle Einstellungen
-URL = "https://nuernberg.termine-reservieren.de/select2?md=8"
+URL = "https://nuernberg.termine-reservieren.de/"
 
 # Persönliche Daten für die Buchung
 ANREDE = "" 
