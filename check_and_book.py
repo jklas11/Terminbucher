@@ -8,10 +8,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 
 # Konfiguration importieren
-import config
+try:
+    import config
+except ImportError:
+    # Fallback für den GitHub-Build-Prozess
+    class MockConfig:
+        URL = ""
+        DRY_RUN = True
+        # Füge hier alle anderen Variablen als leere Strings hinzu,
+        # damit PyInstaller keine Fehler wirft
+        VORNAME = NACHNAME = EMAIL = TELEFON = ""
+        STRASSE = HAUSNUMMER = PLZ = ORT = ""
+        GEBURTSDATUM_TAG = GEBURTSDATUM_MONAT = GEBURTSDATUM_JAHR = ""
+    config = MockConfig()
 
 def play_sound():
     # Versucht einen Ton abzuspielen (Systemabhängig)
@@ -47,11 +60,14 @@ def main():
     # Browser initialisieren (Hier Firefox, kann auf Chrome geändert werden)
     options = webdriver.FirefoxOptions()
     # options.add_argument("--headless") # Headless für Hintergrundbetrieb
+
     try:
-        driver = webdriver.Firefox(options=options)
+        # Der GeckoDriverManager installiert den Treiber automatisch im Hintergrund
+        service = FirefoxService(GeckoDriverManager().install())
+        driver = webdriver.Firefox(service=service, options=options)
+        print("Browser erfolgreich mit automatischem Treiber gestartet.")
     except Exception as e:
         print(f"Fehler beim Starten des Browsers: {e}")
-        print("Stelle sicher, dass geckodriver installiert ist.")
         return
 
     try:

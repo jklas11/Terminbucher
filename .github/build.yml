@@ -1,0 +1,35 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest  # Wir brauchen Windows, um eine .exe zu bauen
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build with PyInstaller
+      run: |
+        # --onefile packt alles in eine Datei
+        # --noconsole verhindert das schwarze Fenster (optional)
+        pyinstaller --onefile --name "TerminBot" check_and_book.py
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TerminBot-Exe
+        path: dist/TerminBot.exe
