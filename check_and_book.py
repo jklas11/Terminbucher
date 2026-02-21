@@ -2,6 +2,8 @@ import time
 import random
 import datetime
 import os
+import sys
+import importlib.util
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,19 +14,37 @@ from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 
 # Konfiguration importieren
-try:
-    import config
-except ImportError:
-    # Fallback für den GitHub-Build-Prozess
-    class MockConfig:
-        URL = ""
-        DRY_RUN = True
-        # Füge hier alle anderen Variablen als leere Strings hinzu,
-        # damit PyInstaller keine Fehler wirft
-        VORNAME = NACHNAME = EMAIL = TELEFON = ""
-        STRASSE = HAUSNUMMER = PLZ = ORT = ""
-        GEBURTSDATUM_TAG = GEBURTSDATUM_MONAT = GEBURTSDATUM_JAHR = ""
-    config = MockConfig()
+def load_config():
+    if getattr(sys, 'frozen', False):
+        # Wenn als EXE ausgeführt (PyInstaller)
+        application_path = os.path.dirname(sys.executable)
+    else:
+        # Wenn als normales Python-Script ausgeführt
+        application_path = os.path.dirname(os.path.abspath(__file__))
+    
+    config_path = os.path.join(application_path, 'config.py')
+    
+    if os.path.exists(config_path):
+        spec = importlib.util.spec_from_file_location("config", config_path)
+        config_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config_module)
+        print(f"Konfiguration erfolgreich geladen aus: {config_path}")
+        return config_module
+    else:
+        print(f"WARNUNG: Keine config.py im Ordner {application_path} gefunden!")
+        print("Verwende leeres Fallback-Profil. Das Programm wird vermutlich Fehler werfen, wenn keine URL angegeben ist.")
+        # Fallback für den GitHub-Build-Prozess
+        class MockConfig:
+            URL = ""
+            DRY_RUN = True
+            # Füge hier alle anderen Variablen als leere Strings hinzu,
+            # damit PyInstaller keine Fehler wirft
+            VORNAME = NACHNAME = EMAIL = TELEFON = ""
+            STRASSE = HAUSNUMMER = PLZ = ORT = ""
+            GEBURTSDATUM_TAG = GEBURTSDATUM_MONAT = GEBURTSDATUM_JAHR = ""
+        return MockConfig()
+
+config = load_config()
 
 def play_sound():
     # Versucht einen Ton abzuspielen (Systemabhängig)
@@ -48,7 +68,7 @@ def get_valid_dates():
     return dates
 
 def main():
-
+    driver = None
     counter = 0
     # Füge aktuelles Verzeichnis zum PATH hinzu, damit geckodriver gefunden wird
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -558,7 +578,23 @@ def main():
     except Exception as e:
         print(f"Kritischer Fehler: {e}")
     finally:
-        driver.quit()
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"\nUnerwarteter Programm-Absturz: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    if getattr(sys, 'frozen', False) or os.name == 'nt':
+        try:
+            print("\n--- PROGRAMM BEENDET ---")
+            input("Drücke Enter, um das Fenster zu schließen...")
+        except (EOFError, KeyboardInterrupt):
+            pass

@@ -4,7 +4,7 @@
 URL = "https://nuernberg.termine-reservieren.de/select2?md=8"
 
 # Persönliche Daten für die Buchung
-ANREDE = "" # oder "Frau"
+ANREDE = "" 
 VORNAME = ""
 NACHNAME = ""
 EMAIL = ""
