@@ -3,10 +3,15 @@ name: Build EXE
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - "v*.*.*" # Führt die Action aus, wenn du z. B. einen Tag "v1.0.0" pushst
 
 jobs:
   build:
     runs-on: windows-latest  # Wir brauchen Windows, um eine .exe zu bauen
+    permissions:
+      contents: write        # Erlaubt dem Bot, überhaupt ein Release in deinem Repo anzulegen
+
 
     steps:
     - uses: actions/checkout@v4
@@ -33,3 +38,10 @@ jobs:
       with:
         name: TerminBot-Exe
         path: dist/TerminBot.exe
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: dist/TerminBot.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
